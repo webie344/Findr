@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Keepr — Never lose track again</title>
+<meta name="description" content="Remember exactly where you keep things, and ask trusted people to drop a pin for where they left yours." />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0f1115" />
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Keepr" />
+<meta name="mobile-web-app-capable" content="yes" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ======================= GLOBAL LOADER ======================= -->
+<div id="global-loader" class="global-loader hidden">
+  <div class="spinner"></div>
+</div>
+
+<!-- ======================= TOAST ======================= -->
+<div id="toast" class="toast"></div>
+
+<!-- ======================= ONBOARDING ======================= -->
+<section id="onboarding-screen" class="screen">
+  <div class="onboarding-bg">
+    <span class="blob blob-a"></span>
+    <span class="blob blob-b"></span>
+    <span class="blob blob-c"></span>
+  </div>
+
+  <div class="onboarding-skip-row">
+    <div class="brand-mark"><span class="brand-dot"></span>Keepr</div>
+    <button id="btn-skip-onboarding" class="link-btn">Skip</button>
+  </div>
+
+  <div class="onboarding-track" id="onboarding-track">
+
+    <div class="onboarding-slide" data-slide="0">
+      <div class="onboarding-art" aria-hidden="true">
+        <div class="art-card art-card-1">
+          <div class="art-photo">🎒</div>
+          <div class="art-pin-ping">
+            <span class="pin-dot"></span>
+            <span class="pin-pulse"></span>
+          </div>
+        </div>
+      </div>
+      <h1 class="onboarding-title">Snap it. <span class="accent">Pin it.</span><br/>Never dig for it again.</h1>
+      <p class="onboarding-copy">Take a photo of anything you're keeping somewhere — a bag, keys, documents — and Keepr quietly remembers the exact spot.</p>
+    </div>
+
+    <div class="onboarding-slide" data-slide="1">
+      <div class="onboarding-art" aria-hidden="true">
+        <div class="art-card art-card-2">
+          <div class="chat-bubble chat-bubble-out">Where did you leave my charger? 🔌</div>
+          <div class="chat-bubble chat-bubble-in">
+            <span class="mini-pin">📍</span> Location shared
+          </div>
+        </div>
+      </div>
+      <h1 class="onboarding-title">Ask, don't guess.<br/><span class="accent">They choose to share.</span></h1>
+      <p class="onboarding-copy">Send a link that clearly says what it's for. Only if they tap "Share my location" do you get the pin — nothing silent, nothing hidden.</p>
+    </div>
+
+    <div class="onboarding-slide" data-slide="2">
+      <div class="onboarding-art" aria-hidden="true">
+        <div class="art-card art-card-3">
+          <div class="bell-wrap">
+            <div class="bell">🔔</div>
+          </div>
+          <div class="reminder-toast-mock">Leaving without your <b>House Keys</b>?</div>
+        </div>
+      </div>
+      <h1 class="onboarding-title">Walking away?<br/><span class="accent">We'll nudge you.</span></h1>
+      <p class="onboarding-copy">Set a reminder on any spot. If you head off without that item, Keepr checks in so you don't find out when it's too late.</p>
+    </div>
+
+  </div>
+
+  <div class="onboarding-footer">
+    <div class="onboarding-dots" id="onboarding-dots">
+      <span class="dot active" data-dot="0"></span>
+      <span class="dot" data-dot="1"></span>
+      <span class="dot" data-dot="2"></span>
+    </div>
+    <button id="btn-onboarding-next" class="btn btn-primary btn-wide">
+      <span>Get started</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ======================= AUTH ======================= -->
+<section id="auth-screen" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="brand-mark brand-mark-lg"><span class="brand-dot"></span>Keepr</div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="login">Log in</button>
+        <button class="auth-tab" data-auth-tab="signup">Sign up</button>
+        <span class="auth-tab-indicator" id="auth-tab-indicator"></span>
+      </div>
+
+      <form id="form-login" class="auth-form">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+        </label>
+        <button type="button" id="btn-forgot" class="link-btn link-btn-right">Forgot password?</button>
+        <button type="submit" class="btn btn-primary btn-wide">Log in</button>
+      </form>
+
+      <form id="form-signup" class="auth-form hidden">
+        <label class="field">
+          <span>Name</span>
+          <input type="text" name="name" required autocomplete="name" placeholder="Dave" />
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="At least 6 characters" />
+        </label>
+        <button type="submit" class="btn btn-primary btn-wide">Create account</button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <button id="btn-google" class="btn btn-ghost btn-wide">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.6 35.3 26.9 36 24 36c-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.7l6.6 5.4C41.3 36.2 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+    <p class="auth-footnote">By continuing you agree this app only shares a location when that person explicitly taps to share it.</p>
+  </div>
+</section>
+
+<!-- ======================= MAIN APP ======================= -->
+<section id="app-screen" class="screen hidden">
+
+  <header class="app-header">
+    <div class="brand-mark"><span class="brand-dot"></span>Keepr</div>
+    <button id="btn-profile" class="avatar-btn" aria-label="Profile">
+      <span id="avatar-initial">D</span>
+    </button>
+  </header>
+
+  <div id="install-banner" class="install-banner hidden">
+    <span class="install-banner-icon">📲</span>
+    <div class="install-banner-text">
+      <strong>Install Keepr</strong>
+      <span class="muted small">Add it to your home screen for one-tap access</span>
+    </div>
+    <button id="btn-install-banner" class="btn btn-primary">Install</button>
+    <button id="btn-dismiss-banner" class="install-banner-close" aria-label="Dismiss">✕</button>
+  </div>
+
+  <main class="app-main">
+
+    <!-- ----- ITEMS LIST ----- -->
+    <div id="view-items" class="view">
+      <div class="view-head">
+        <h2>Your things</h2>
+        <p class="muted" id="items-subtitle">Tap a card to see its spot</p>
+      </div>
+
+      <div class="search-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="input-search-items" placeholder="Search your items…" />
+      </div>
+
+      <div id="items-list" class="items-list"></div>
+
+      <div id="items-empty" class="empty-state hidden">
+        <div class="empty-emoji">🧭</div>
+        <h3>Nothing kept yet</h3>
+        <p>Add your first item and snap its spot so you always know where it is.</p>
+      </div>
+    </div>
+
+    <!-- ----- ADD ITEM ----- -->
+    <div id="view-add" class="view hidden">
+      <div class="view-head">
+        <button class="back-btn" data-back="view-items">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h2>Keep something new</h2>
+      </div>
+
+      <form id="form-add-item" class="stack-form">
+        <label class="photo-dropzone" id="photo-dropzone">
+          <input type="file" id="input-photo" accept="image/*" capture="environment" hidden />
+          <div id="photo-preview-wrap" class="photo-preview-wrap">
+            <span id="photo-placeholder" class="photo-placeholder">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l2-2h6l2 2h3v12H4V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="currentColor" stroke-width="1.8"/></svg>
+              <span>Tap to snap or upload a photo</span>
+            </span>
+            <img id="photo-preview-img" class="photo-preview-img hidden" alt="Item preview" />
+          </div>
+        </label>
+
+        <label class="field">
+          <span>What is it?</span>
+          <input type="text" id="input-item-name" required placeholder="e.g. Passport, House keys, Travel bag" />
+        </label>
+
+        <label class="field">
+          <span>Note (optional)</span>
+          <textarea id="input-item-note" rows="2" placeholder="e.g. Top drawer, behind the books"></textarea>
+        </label>
+
+        <div class="location-capture-box" id="location-capture-box">
+          <div class="location-capture-row">
+            <div class="location-capture-icon">📍</div>
+            <div class="location-capture-text">
+              <strong id="location-capture-title">Pin this item's current location</strong>
+              <span id="location-capture-sub" class="muted small">We'll use your device's precise location</span>
+            </div>
+          </div>
+          <button type="button" id="btn-capture-location" class="btn btn-soft">Use my location</button>
+        </div>
+
+        <label class="toggle-row">
+          <span>
+            <strong>Remind me if I leave without it</strong>
+            <span class="muted small">Nudges you while Keepr is open and this spot is being watched</span>
+          </span>
+          <span class="switch">
+            <input type="checkbox" id="input-item-reminder" />
+            <span class="slider"></span>
+          </span>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-wide" id="btn-save-item">Save item</button>
+      </form>
+    </div>
+
+    <!-- ----- ITEM DETAIL ----- -->
+    <div id="view-item-detail" class="view hidden">
+      <div class="view-head">
+        <button class="back-btn" data-back="view-items">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h2 id="detail-item-name">Item</h2>
+        <button class="icon-btn-right" id="btn-delete-item" aria-label="Delete item">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m-8 0 .9 12.1A2 2 0 0 0 9.9 21h4.2a2 2 0 0 0 2-1.9L17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="detail-photo-wrap">
+        <img id="detail-photo" class="detail-photo" alt="" />
+      </div>
+
+      <div class="detail-body">
+        <p id="detail-note" class="detail-note muted"></p>
+
+        <div class="map-card" id="map-card">
+          <iframe id="map-frame" class="map-frame" title="Item location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="map-meta">
+            <span id="map-updated" class="muted small"></span>
+            <a id="map-open-link" href="#" target="_blank" rel="noopener" class="link-btn">Open in Maps</a>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button id="btn-share-request" class="btn btn-primary btn-wide">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v13M8 6l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Ask someone to share where they left it
+          </button>
+        </div>
+
+        <div id="share-requests-wrap" class="share-requests-wrap hidden">
+          <h4>Pin requests</h4>
+          <div id="share-requests-list" class="share-requests-list"></div>
+        </div>
+
+        <label class="toggle-row toggle-row-card">
+          <span>
+            <strong>Remind me if I leave without it</strong>
+            <span class="muted small">Only while Keepr is open on this device</span>
+          </span>
+          <span class="switch">
+            <input type="checkbox" id="detail-input-reminder" />
+            <span class="slider"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ----- SHARE LINK MODAL CONTENT (rendered via JS into #modal-root) ----- -->
+
+    <!-- ----- PROFILE ----- -->
+    <div id="view-profile" class="view hidden">
+      <div class="view-head">
+        <button class="back-btn" data-back="view-items">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h2>Profile</h2>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-avatar" id="profile-avatar">D</div>
+        <div>
+          <strong id="profile-name">—</strong>
+          <p class="muted small" id="profile-email">—</p>
+        </div>
+      </div>
+
+      <div class="profile-stat-row">
+        <div class="profile-stat">
+          <strong id="stat-items-count">0</strong>
+          <span class="muted small">Items kept</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="stat-shared-count">0</strong>
+          <span class="muted small">Pins received</span>
+        </div>
+      </div>
+
+      <button id="btn-install-app" class="btn btn-soft btn-wide hidden">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Install Keepr app
+      </button>
+      <p id="ios-install-hint" class="muted small ios-install-hint hidden">
+        Install Keepr: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.
+      </p>
+      <button id="btn-notif-permission" class="btn btn-soft btn-wide">Enable reminder notifications</button>
+      <button id="btn-signout" class="btn btn-ghost btn-wide danger">Sign out</button>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="view-items" aria-label="Items">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Items</span>
+    </button>
+    <button class="nav-btn nav-btn-fab" id="btn-nav-add" aria-label="Add item">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+    <button class="nav-btn" data-view="view-profile" aria-label="Profile">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+</section>
+
+<!-- ======================= SHARE (RECIPIENT) PAGE ======================= -->
+<section id="share-screen" class="screen hidden">
+  <div class="share-wrap">
+    <div class="brand-mark brand-mark-lg"><span class="brand-dot"></span>Keepr</div>
+
+    <div class="share-card" id="share-card">
+      <div class="share-card-loading" id="share-loading">
+        <div class="spinner"></div>
+        <p class="muted">Loading request…</p>
+      </div>
+
+      <div id="share-content" class="hidden">
+        <img id="share-item-photo" class="share-item-photo" alt="" />
+        <p class="share-kicker" id="share-requester-line">Someone wants to know where you left:</p>
+        <h2 id="share-item-name">Item</h2>
+        <p class="share-note" id="share-item-note"></p>
+
+        <div class="share-consent-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="share-consent-icon"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <p>Tapping below shares your <strong>precise current location</strong> with them, once. Nothing is shared unless you tap it, and your location won't be requested again from this link afterwards.</p>
+        </div>
+
+        <button id="btn-share-my-location" class="btn btn-primary btn-wide">Share my location</button>
+        <button id="btn-decline-share" class="btn btn-ghost btn-wide">No thanks</button>
+      </div>
+
+      <div id="share-done" class="hidden">
+        <div class="share-done-emoji">✅</div>
+        <h2>Location shared</h2>
+        <p class="muted" id="share-done-text">They've been notified of the spot you shared.</p>
+      </div>
+
+      <div id="share-error" class="hidden">
+        <div class="share-done-emoji">⚠️</div>
+        <h2>Link not available</h2>
+        <p class="muted" id="share-error-text">This request may have expired or already been used.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= SHARE-LINK GENERATED MODAL ======================= -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-sheet" id="modal-sheet"></div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
