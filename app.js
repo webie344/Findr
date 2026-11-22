@@ -29,8 +29,8 @@ const firebaseConfig = {
 // Cloudinary unsigned upload — create an "unsigned" upload preset in your
 // Cloudinary dashboard (Settings → Upload → Upload presets → Add upload preset,
 // set "Signing Mode" to "Unsigned") and paste its name + your cloud name below.
-const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
-const CLOUDINARY_UPLOAD_PRESET = "YOUR_UNSIGNED_PRESET";
+const CLOUDINARY_CLOUD_NAME = "ddtdqrh1b";
+const CLOUDINARY_UPLOAD_PRESET = "profile-pictures";
 
 /* -----------------------------------------------------------
    2. INIT
